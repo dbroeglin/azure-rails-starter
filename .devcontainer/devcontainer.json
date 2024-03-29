@@ -14,9 +14,10 @@
                 "ms-azuretools.azure-dev",
                 "ms-azuretools.vscode-azurefunctions",
                 "ms-azuretools.vscode-bicep",
-                "ms-azuretools.vscode-docker"
-                // Include other VSCode language extensions if needed
-                // Right click on an extension inside VSCode to add directly to devcontainer.json, or copy the extension ID
+                "ms-azuretools.vscode-docker",
+                "Shopify.ruby-extensions-pack",
+                "GitHub.copilot",
+                "GitHub.copilot-chat"
             ]
         }
     },
@@ -26,6 +27,6 @@
     "postCreateCommand": "",
     "remoteUser": "vscode",
     "hostRequirements": {
-        "memory": "8gb"
+        "memory": "4gb"
     }
 }
