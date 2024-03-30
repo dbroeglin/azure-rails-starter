@@ -21,13 +21,13 @@ default: &default
 
 development:
   <<: *default
-  database: azure_rails_demo_development
+  database: azure_rails_starter_development
 
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.
   # When left blank, PostgreSQL will use the default role. This is
   # the same name as the operating system user running Rails.
-  #username: azure_rails_demo
+  #username: azure_rails_starter
 
   # The password associated with the PostgreSQL role (username).
   #password:
@@ -55,7 +55,7 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: azure_rails_demo_test
+  database: azure_rails_starter_test
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -79,6 +79,6 @@ test:
 #
 production:
   <<: *default
-  database: azure_rails_demo_production
-  username: azure_rails_demo
-  password: <%= ENV["AZURE_RAILS_DEMO_DATABASE_PASSWORD"] %>
+  database: azure_rails_starter_production
+  username: azure_rails_starter
+  password: <%= ENV["AZURE_RAILS_STARTER_DATABASE_PASSWORD"] %>
