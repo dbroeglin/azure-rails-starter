@@ -77,4 +77,4 @@ For `appservice`, the following host configuration options are often modified:
 
 ## Rails setup journal
 
-    rails new --database=postgresql --name=azure-rails-demo src
+    rails new --database=postgresql --name=azure-rails-starter src

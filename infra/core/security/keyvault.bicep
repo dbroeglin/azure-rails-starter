@@ -3,7 +3,11 @@ param name string
 param location string = resourceGroup().location
 param tags object = {}
 
-param principalId string = ''
+param identityName string = ''
+
+resource userIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (!empty(identityName)) {
+  name: identityName
+}
 
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   name: name
@@ -12,9 +16,9 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   properties: {
     tenantId: subscription().tenantId
     sku: { family: 'A', name: 'standard' }
-    accessPolicies: !empty(principalId) ? [
+    accessPolicies: !empty(userIdentity.properties.principalId) ? [
       {
-        objectId: principalId
+        objectId: userIdentity.properties.principalId
         permissions: { secrets: [ 'get', 'list' ] }
         tenantId: subscription().tenantId
       }
@@ -24,3 +28,4 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
 
 output endpoint string = keyVault.properties.vaultUri
 output name string = keyVault.name
+output principalId string = userIdentity.properties.principalId

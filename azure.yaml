@@ -1,8 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
 # To learn more about the azure.yaml file, visit https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/azd-schema
-name: azd-starter
+name: azd-rails-starter
 services:
-  azure-rails-demo:
+  azure-rails-starter:
     language: js
     project: ./src
     host: containerapp
@@ -10,3 +10,15 @@ services:
       path: ./Dockerfile
       ports:
         - 80:3000
+hooks:
+  postprovision:
+    windows:
+      shell: pwsh
+      run: $output = azd env get-values; Add-Content -Path .env -Value $output;
+      interactive: true
+      continueOnError: false
+    posix:
+      shell: sh
+      run: azd env get-values > .env
+      interactive: true
+      continueOnError: false

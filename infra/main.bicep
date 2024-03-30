@@ -13,18 +13,37 @@ param environmentName string
 @description('Primary location for all resources')
 param location string
 
+@secure()
+@description('PostGreSQL Server administrator password')
+param postgresAdminPassword string
+
+@secure()
+@description('Rails SECRET_KEY_BASE for cryptographic signing')
+param railsSecretKeyBase string
+
 // Optional parameters to override the default azd resource naming conventions.
 // Add the following to main.parameters.json to provide values:
 // "resourceGroupName": {
 //      "value": "myGroupName"
 // }
+@description('Resource group name')
 param resourceGroupName string = ''
+
+@description('PostgreSQL database name')
+param postgresDatabaseName string = 'azure_rails_starter_production'
+
+@description('Keyvault resource name')
+param keyVaultName string = ''
+
+@description('Azure Container Apps identity name')
+param identityName string = ''
+
+@description('If true use existing Azure Container Apps instance')
+param acaExists bool = false
 
 var abbrs = loadJsonContent('./abbreviations.json')
 
-// tags that should be applied to all resources.
 var tags = {
-  // Tag all resources with the environment name.
   'azd-env-name': environmentName
 }
 
@@ -38,7 +57,7 @@ var resourceToken = toLower(uniqueString(subscription().id, environmentName, loc
 //   Microsoft.Web/sites for appservice, function
 // Example usage:
 //   tags: union(tags, { 'azd-service-name': apiServiceName })
-var apiServiceName = 'python-api'
+var appServiceName = 'azure-rails-starter'
 
 // Organize resources in a resource group
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
@@ -48,11 +67,23 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
 }
 
 var prefix = '${environmentName}-${resourceToken}'
+var railsIdentityName = !empty(identityName) ? identityName : '${abbrs.managedIdentityUserAssignedIdentities}rails-${environmentName}'
+var postgresServerName = '${abbrs.dBforPostgreSQLServers}${prefix}'
+var postgresAdminUser = 'admin${uniqueString(resourceGroup.id)}'
 
 // Add resources to be provisioned below.
 // A full example that leverages azd bicep modules can be seen in the todo-python-mongo template:
 // https://github.com/Azure-Samples/todo-python-mongo/tree/main/infra
 
+module railsIdentity 'identity.bicep' = {
+  name: 'identity'
+  scope: resourceGroup
+  params: {
+    name: railsIdentityName
+    location: location
+    tags: tags
+  }
+}
 
 module logAnalyticsWorkspace 'core/monitor/loganalytics.bicep' = {
   name: 'loganalytics'
@@ -64,7 +95,28 @@ module logAnalyticsWorkspace 'core/monitor/loganalytics.bicep' = {
   }
 }
 
-// Container apps host (including container registry)
+module postgresServer 'core/database/postgresql/flexibleserver.bicep' = {
+  name: 'postgresql'
+  scope: resourceGroup
+  params: {
+    name: postgresServerName
+    location: location
+    tags: tags
+    sku: {
+      name: 'Standard_B1ms'
+      tier: 'Burstable'
+    }
+    storage: {
+      storageSizeGB: 32
+    }
+    version: '14'
+    administratorLogin: postgresAdminUser
+    administratorLoginPassword: postgresAdminPassword
+    databaseNames: [ postgresDatabaseName ]
+    allowAzureIPsFirewall: true
+  }
+}
+
 module containerApps 'core/host/container-apps.bicep' = {
   name: 'container-apps'
   scope: resourceGroup
@@ -78,6 +130,68 @@ module containerApps 'core/host/container-apps.bicep' = {
   }
 }
 
+ module keyVault './core/security/keyvault.bicep' = {
+  name: 'keyvault'
+  scope: resourceGroup
+  params: {
+    name: !empty(keyVaultName) ? keyVaultName : '${abbrs.keyVaultVaults}${resourceToken}'
+    location: location
+    tags: tags
+    identityName: railsIdentity.outputs.name
+  }
+}
+
+
+module keyVaultAccess './core/security/keyvault-access.bicep' = {
+  name: 'keyvault-access'
+  scope: resourceGroup
+  params: {
+    keyVaultName: keyVault.outputs.name
+    principalId: railsIdentity.outputs.principalId
+  }
+}
+
+module keyVaultSecretDatabaseUrl './core/security/keyvault-secret.bicep' =  {
+  name: 'keyvault-secret-database-url'
+  scope: resourceGroup
+  params: {
+    keyVaultName: keyVault.outputs.name
+    name: 'database-url'
+    secretValue: 'postgresql://${postgresAdminUser}:${postgresAdminPassword}@${postgresServer.outputs.POSTGRES_DOMAIN_NAME}:5432/${postgresDatabaseName}?connect_timeout=5&sslmode=require'
+  }
+}
+
+module keyVaultSecretSecretKeyBase './core/security/keyvault-secret.bicep' =  {
+  name: 'keyvault-secret-secret-key-base'
+  scope: resourceGroup
+  params: {
+    keyVaultName: keyVault.outputs.name
+    name: 'secret-key-base'
+    secretValue: railsSecretKeyBase
+  }
+}
+
+module rails 'rails.bicep' = {
+  name: 'rails'
+  scope: resourceGroup
+  params: {
+    name: replace('${take(prefix,19)}-ca', '--', '-')
+    location: location
+    tags: tags
+    identityName: railsIdentity.outputs.name
+    containerAppsEnvironmentName: containerApps.outputs.environmentName
+    containerRegistryName: containerApps.outputs.registryName
+    serviceName: appServiceName
+    exists: acaExists
+    keyVaultName: keyVault.outputs.name
+  }
+  dependsOn: [
+    keyVaultSecretDatabaseUrl
+    keyVaultSecretSecretKeyBase
+    keyVaultAccess
+  ]
+} 
+ 
 // Add outputs from the deployment here, if needed.
 //
 // This allows the outputs to be referenced by other bicep deployments in the deployment pipeline,
@@ -86,5 +200,17 @@ module containerApps 'core/host/container-apps.bicep' = {
 //
 // Outputs are automatically saved in the local azd environment .env file.
 // To see these outputs, run `azd env get-values`,  or `azd env get-values --output json` for json output.
+
+
 output AZURE_LOCATION string = location
 output AZURE_TENANT_ID string = tenant().tenantId
+
+
+output SERVICE_RAILS_IDENTITY_PRINCIPAL_ID string = rails.outputs.SERVICE_RAILS_IDENTITY_PRINCIPAL_ID
+output SERVICE_RAILS_NAME string = rails.outputs.SERVICE_RAILS_NAME
+output SERVICE_RAILS_URI string = rails.outputs.SERVICE_RAILS_URI
+output SERVICE_RAILS_IMAGE_NAME string = rails.outputs.SERVICE_RAILS_IMAGE_NAME
+
+output AZURE_CONTAINER_ENVIRONMENT_NAME string = containerApps.outputs.environmentName
+output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerApps.outputs.registryLoginServer
+output AZURE_CONTAINER_REGISTRY_NAME string = containerApps.outputs.registryName
