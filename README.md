@@ -16,6 +16,9 @@ urlFragment: azure-rails-starter
 
 # Deploy a Rails (Ruby) web app with PostgreSQL In Azure Container Apps 
 
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/dbroeglin/azure-rails-starter?quickstart=1)
+
 This is a starter blueprint for getting your Rails application up and running on Azure using [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/overview) (azd). The Rails application is deployed in an Azure Container App and uses an Azure Postgresql database. The starter uses Infrastructure as Code assets in [Bicep](https://aka.ms/bicep) to get your application up and running quickly.
 
 ![Azure Rails Starter Overview](assets/Azure%20Rails%20Starter%20Overview.png)
@@ -102,4 +105,4 @@ This can be useful to apply `bin/rails db:migrate` commands or access the Rails 
 
 ## Getting help
 
-If you're working with this project and running into issues, please post in [Issues](/issues).
+If you're working with this project and running into issues, please post an Issue by clicking on the link above.
