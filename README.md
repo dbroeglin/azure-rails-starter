@@ -1,11 +1,6 @@
 # Azure Developer CLI (azd) Rails on Azure starter with Bicep and Postgresql 
 
-A starter blueprint for getting your Rails application up on Azure using [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/overview) (azd). The Rails application is deployed in Azure Container Apps and uses an Azure Postgresql database. The starter uses Infrastructure as Code assets in [Bicep](https://aka.ms/bicep) to get your application up and running quickly.
-
-The rails application has been created by running the following command:
-
-    rails new --database=postgresql --name=azure-rails-starter src
-    rm -rf src/.git
+A starter blueprint for getting your Rails application up and running on Azure using [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/overview) (azd). The Rails application is deployed in an Azure Container App and uses an Azure Postgresql database. The starter uses Infrastructure as Code assets in [Bicep](https://aka.ms/bicep) to get your application up and running quickly.
 
 The following assets have been provided:
 
@@ -13,30 +8,15 @@ The following assets have been provided:
 - A [dev container](https://containers.dev) configuration file under the `.devcontainer` directory that installs infrastructure tooling by default. This can be readily used to create cloud-hosted developer environments such as [GitHub Codespaces](https://aka.ms/codespaces).
   - Ruby 3.3.0 
   - GitHub Copilot
+  - Postgresql running in a container (for development)
+  - Redis running in a container (for development)
 - Continuous deployment workflows for CI providers such as GitHub Actions under the `.github` directory, and Azure Pipelines under the `.azdo` directory that work for most use-cases.
-- A freshly created Rails 7.1.3 application under directory `src`. The application has been created with `rails new --database=postgresql --name=azure-rails-starter src`. If you need a different setup just delete `src` and re-run the command with a different version of Rails, application name or database backend.
-
-## Next Steps
-
-3. Run `azd package` to validate that all service source code projects can be built and packaged locally.
+- A freshly created Rails 7.1.3 application under directory `src`.
 
 
-Run `azd provision` whenever you want to ensure that changes made are applied correctly and work as expected.
+### Getting it up and running in Azure
 
-
-1. Set up [application settings](#application-settings) for the code running in Azure to connect to other Azure resources.
-1. If you are accessing sensitive resources in Azure, set up [managed identities](#managed-identities) to allow the code running in Azure to securely access the resources.
-1. If you have secrets, it is recommended to store secrets in [Azure Key Vault](#azure-key-vault) that then can be retrieved by your application, with the use of managed identities.
-1. Configure [host configuration](#host-configuration) on your hosting platform to match your application's needs. This may include networking options, security options, or more advanced configuration that helps you take full advantage of Azure capabilities.
-
-When changes are made, use azd to validate and apply your changes in Azure, to ensure that they are working as expected:
-
-- Run `azd up` to validate both infrastructure and application code changes.
-- Run `azd deploy` to validate application code changes only.
-
-### Step 4: Up to Azure
-
-Finally, run `azd up` to run the end-to-end infrastructure provisioning (`azd provision`) and deployment (`azd deploy`) flow. Visit the service endpoints listed to see your application up-and-running!
+Just run `azd up` to run the end-to-end infrastructure provisioning (`azd provision`) and deployment (`azd deploy`) flow. Visit the service endpoint listed to see your application up-and-running!
 
 ## Additional Details
 
@@ -46,19 +26,25 @@ The following section examines different concepts that help tie in application a
 
 It is recommended to have application settings managed in Azure, separating configuration from code. Typically, the service host allows for application settings to be defined.
 
-- For `appservice` and `function`, application settings should be defined on the Bicep resource for the targeted host. Reference template example [here](https://github.com/Azure-Samples/todo-nodejs-mongo/tree/main/infra).
-- For `aks`, application settings are applied using deployment manifests under the `<service>/manifests` folder. Reference template example [here](https://github.com/Azure-Samples/todo-nodejs-mongo-aks/tree/main/src/api/manifests).
+- Application settings should be defined on the Bicep resource for the Azure Container App. See [main.bicep](./infra/rails.bicep#L43) for an example setting environment variables and using secrets stored in Azure Key Vault.
+- Environment variables for your developer environment (Dev Containers or Codespaces) can be defined in [.decontainer/Dockerfile](.devcontainer/Dockerfile).
 
 ### Managed identities
 
-[Managed identities](https://learn.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/overview) allows you to secure communication between services. This is done without having the need for you to manage any credentials.
+[Managed identities](https://learn.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/overview) allows you to secure communication between services. This is done without having the need for you to manage any credentials. It is used between Azure Container Apps and Azure Key Vault to automatically retrieve secrets.s
 
 ### Azure Key Vault
 
 [Azure Key Vault](https://learn.microsoft.com/en-us/azure/key-vault/general/overview) allows you to store secrets securely. Your application can access these secrets securely through the use of managed identities.
 
+## Getting started with Rails development
 
-## Getting started developing
+### Provisioning & deploying with Azure Developer CLI
+
+When changes are made, use azd to validate and apply your changes in Azure, to ensure that they are working as expected:
+
+- Run `azd up` to validate both infrastructure and application code changes.
+- Run `azd deploy` to validate application code changes only.
 
 ### Running Rails commands
 
@@ -80,6 +66,18 @@ Run the Rails migration command:
 
 ### Connecting to the Postgresql database
 
-   psql $DATABASE_URL
+    psql $DATABASE_URL
 
+### Re-creating the Rails application
 
+The rails application has been created by running the following command:
+
+    rails new --database=postgresql --name=azure-rails-starter src
+    rm -rf src/.git
+
+### Shell in the Azure Container App 
+
+    . ./.env
+    az containerapp exec --name $SERVICE_RAILS_NAME --resource-group $AZURE_RESOURCE_GROUP_NAME
+
+This can be useful to apply `bin/rails db:migrate` commands or access the Rails console through `bin/rails console`.
