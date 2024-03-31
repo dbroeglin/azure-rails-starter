@@ -1,0 +1,26 @@
+@startuml Azure Rails Starter Overview
+
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+!define AzurePuml https://raw.githubusercontent.com/plantuml-stdlib/Azure-PlantUML/release/2-2/dist
+!includeurl AzurePuml/AzureCommon.puml
+!includeurl AzurePuml/AzureC4Integration.puml
+!includeurl AzurePuml/Containers/AzureContainerApp.puml
+!includeurl AzurePuml/Security/AzureKeyVault.puml
+!includeurl AzurePuml/Databases/AzureDatabaseForPostgreSQL.puml
+
+Person(person, "User")
+
+Boundary(system, "Environment", "Azure Container Apps Environment") {
+  AzureContainerApp(rails, "Rails", "Container")
+}
+
+AzureDatabaseForPostgreSQL(database, "Database", "azure_rails_starter_production")
+AzureKeyVault(keyvault, "Key Vault", "Secrets", "Database URL, Rails Secret Key Base")
+
+person -> rails: Uses
+rails -> database: Reads/Writes
+rails -down-> keyvault: "Read Secrets"
+
+
+@enduml

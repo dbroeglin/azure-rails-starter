@@ -1,6 +1,24 @@
-# Azure Developer CLI (azd) Rails on Azure starter with Bicep and Postgresql 
+---
+name: Azure Rails Starter
+description: Sample Rails application deployed through Azure Developer CLI (azd) on Azure Container App and Azure Database for PostgreSQL
+languages:
+- ruby
+- bicep
+- azdeveloper
+products:
+- azure-container-apps
+- azure-database-postgresql
+- azure-key-vault
+- azure
+page_type: sample
+urlFragment: azure-rails-starter
+---
 
-A starter blueprint for getting your Rails application up and running on Azure using [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/overview) (azd). The Rails application is deployed in an Azure Container App and uses an Azure Postgresql database. The starter uses Infrastructure as Code assets in [Bicep](https://aka.ms/bicep) to get your application up and running quickly.
+# Deploy a Rails (Ruby) web app with PostgreSQL In Azure Container Apps 
+
+This is a starter blueprint for getting your Rails application up and running on Azure using [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/overview) (azd). The Rails application is deployed in an Azure Container App and uses an Azure Postgresql database. The starter uses Infrastructure as Code assets in [Bicep](https://aka.ms/bicep) to get your application up and running quickly.
+
+![Azure Rails Starter Overview](assets/Azure%20Rails%20Starter%20Overview.png)
 
 The following assets have been provided:
 
@@ -81,3 +99,7 @@ The rails application has been created by running the following command:
     az containerapp exec --name $SERVICE_RAILS_NAME --resource-group $AZURE_RESOURCE_GROUP_NAME
 
 This can be useful to apply `bin/rails db:migrate` commands or access the Rails console through `bin/rails console`.
+
+## Getting help
+
+If you're working with this project and running into issues, please post in [Issues](/issues).
