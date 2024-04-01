@@ -22,5 +22,4 @@ person -> rails: Uses
 rails -> database: Reads/Writes
 rails -down-> keyvault: "Read Secrets"
 
-
 @enduml

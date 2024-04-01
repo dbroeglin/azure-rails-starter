@@ -103,6 +103,14 @@ The rails application has been created by running the following command:
 
 This can be useful to apply `bin/rails db:migrate` commands or access the Rails console through `bin/rails console`.
 
+### Clean up resources
+
+    azd down
+
+If you want to make sure you can recreate the same environment, KeyVault needs to be purged:
+
+    azd down --purge
+
 ## Getting help
 
 If you're working with this project and running into issues, please post an Issue by clicking on the link above.

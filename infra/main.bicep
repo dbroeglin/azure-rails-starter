@@ -203,7 +203,7 @@ module rails 'rails.bicep' = {
 
 
 output AZURE_LOCATION string = location
-output AZURE_RESOURCE_GROUP_NAME = resourceGroup.name
+output AZURE_RESOURCE_GROUP_NAME string = resourceGroup.name
 output AZURE_TENANT_ID string = tenant().tenantId
 
 output SERVICE_RAILS_IDENTITY_PRINCIPAL_ID string = rails.outputs.SERVICE_RAILS_IDENTITY_PRINCIPAL_ID
