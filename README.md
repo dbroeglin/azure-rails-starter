@@ -39,6 +39,12 @@ The following assets have been provided:
 
 Just run `azd up` to run the end-to-end infrastructure provisioning (`azd provision`) and deployment (`azd deploy`) flow. Visit the service endpoint listed to see your application up-and-running!
 
+Quick start:
+
+```bash
+SECRET_KEY_BASE=$(src/bin/rails secret) azd up
+```
+
 ## Additional Details
 
 The following section examines different concepts that help tie in application and infrastructure.
@@ -71,45 +77,63 @@ When changes are made, use azd to validate and apply your changes in Azure, to e
 
 Move to the `src` directory:
 
-    cd src
+```bash
+cd src
+```
 
 Run the Rails server:
 
-    bin/rails server
+```bash
+bin/rails server
+```
 
 Run the Rails console:
 
-    bin/rails console 
+```bash
+bin/rails console 
+```
 
 Run the Rails migration command:
 
-    bin/rails db:migrate
+```bash
+bin/rails db:migrate
+```
 
 ### Connecting to the Postgresql database
 
-    psql $DATABASE_URL
+```bash
+psql $DATABASE_URL
+```
 
 ### Re-creating the Rails application
 
 The rails application has been created by running the following command:
 
-    rails new --database=postgresql --name=azure-rails-starter src
-    rm -rf src/.git
+```bash
+rails new --database=postgresql --name=azure-rails-starter src
+rm -rf src/.git
+```
 
 ### Shell in the Azure Container App 
 
-    . ./.env
-    az containerapp exec --name $SERVICE_RAILS_NAME --resource-group $AZURE_RESOURCE_GROUP_NAME
+```bash
+. ./.env
+az containerapp exec --name $SERVICE_RAILS_NAME --resource-group $AZURE_RESOURCE_GROUP_NAME
+```
 
 This can be useful to apply `bin/rails db:migrate` commands or access the Rails console through `bin/rails console`.
 
 ### Clean up resources
 
+```bash
     azd down
+```
 
 If you want to make sure you can recreate the same environment, KeyVault needs to be purged:
 
+```bash
     azd down --purge
+```
 
 ## Getting help
 

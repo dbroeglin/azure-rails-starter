@@ -151,6 +151,16 @@ module keyVaultAccess './core/security/keyvault-access.bicep' = {
   }
 }
 
+module keyVaultSecretPostgresAdminPassword './core/security/keyvault-secret.bicep' =  {
+  name: 'keyvault-secret-postgres-admin-password'
+  scope: resourceGroup
+  params: {
+    keyVaultName: keyVault.outputs.name
+    name: 'postgres-admin-password'
+    secretValue: postgresAdminPassword
+  }
+}
+
 module keyVaultSecretDatabaseUrl './core/security/keyvault-secret.bicep' =  {
   name: 'keyvault-secret-database-url'
   scope: resourceGroup
@@ -205,11 +215,13 @@ module rails 'rails.bicep' = {
 output AZURE_LOCATION string = location
 output AZURE_RESOURCE_GROUP_NAME string = resourceGroup.name
 output AZURE_TENANT_ID string = tenant().tenantId
+output AZURE_KEY_VAULT_NAME string = keyVault.outputs.name
 
 output SERVICE_RAILS_IDENTITY_PRINCIPAL_ID string = rails.outputs.SERVICE_RAILS_IDENTITY_PRINCIPAL_ID
 output SERVICE_RAILS_NAME string = rails.outputs.SERVICE_RAILS_NAME
 output SERVICE_RAILS_URI string = rails.outputs.SERVICE_RAILS_URI
 output SERVICE_RAILS_IMAGE_NAME string = rails.outputs.SERVICE_RAILS_IMAGE_NAME
+output SERVICE_RAILS_DATABASE_NAME string = postgresDatabaseName
 
 output AZURE_CONTAINER_ENVIRONMENT_NAME string = containerApps.outputs.environmentName
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerApps.outputs.registryLoginServer
