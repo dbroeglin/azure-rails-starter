@@ -53,6 +53,10 @@ module app 'core/host/container-app-upsert.bicep' = {
         name: 'SECRET_KEY_BASE'
         secretRef: 'secret-key-base'
       }
+      {
+        name: 'RAILS_MASTER_KEY'
+        secretRef: 'rails-master-key'
+      }
     ]
     secrets: [
       {
@@ -63,6 +67,11 @@ module app 'core/host/container-app-upsert.bicep' = {
       {
         name: 'secret-key-base'
         keyVaultUrl: '${keyVault.properties.vaultUri}secrets/secret-key-base'
+        identity: webIdentity.id
+      }
+      {
+        name: 'rails-master-key'
+        keyVaultUrl: '${keyVault.properties.vaultUri}secrets/rails-master-key'
         identity: webIdentity.id
       }
     ]

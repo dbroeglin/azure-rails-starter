@@ -15,6 +15,9 @@
     "railsSecretKeyBase": {
       "value": "${SECRET_KEY_BASE}"
     },
+    "railsMasterKey": {
+      "value": "${RAILS_MASTER_KEY}"
+    },
     "postgresDatabaseName": {
       "value": "${SERVICE_RAILS_DATABASE_NAME}"
     }

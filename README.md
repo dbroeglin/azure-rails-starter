@@ -42,7 +42,9 @@ Just run `azd up` to run the end-to-end infrastructure provisioning (`azd provis
 Quick start:
 
 ```bash
-SECRET_KEY_BASE=$(src/bin/rails secret) azd up
+SECRET_KEY_BASE="$(src/bin/rails secret)" \
+RAILS_MASTER_KEY="$(cat src/config/master.key)"
+azd up
 ```
 
 ## Additional Details

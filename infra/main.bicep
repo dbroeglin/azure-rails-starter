@@ -21,6 +21,10 @@ param postgresAdminPassword string
 @description('Rails SECRET_KEY_BASE for cryptographic signing')
 param railsSecretKeyBase string
 
+@secure()
+@description('Rails RAILS_MASTER_KEY for secret encryption')
+param railsMasterKey string
+
 // Optional parameters to override the default azd resource naming conventions.
 // Add the following to main.parameters.json to provide values:
 // "resourceGroupName": {
@@ -67,7 +71,9 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
 }
 
 var prefix = '${environmentName}-${resourceToken}'
-var railsIdentityName = !empty(identityName) ? identityName : '${abbrs.managedIdentityUserAssignedIdentities}rails-${environmentName}'
+var railsIdentityName = !empty(identityName)
+  ? identityName
+  : '${abbrs.managedIdentityUserAssignedIdentities}rails-${environmentName}'
 var postgresServerName = '${abbrs.dBforPostgreSQLServers}${prefix}'
 var postgresAdminUser = 'admin${uniqueString(resourceGroup.id)}'
 
@@ -112,7 +118,7 @@ module postgresServer 'core/database/postgresql/flexibleserver.bicep' = {
     version: '14'
     administratorLogin: postgresAdminUser
     administratorLoginPassword: postgresAdminPassword
-    databaseNames: [ postgresDatabaseName ]
+    databaseNames: [postgresDatabaseName]
     allowAzureIPsFirewall: true
   }
 }
@@ -130,7 +136,7 @@ module containerApps 'core/host/container-apps.bicep' = {
   }
 }
 
- module keyVault './core/security/keyvault.bicep' = {
+module keyVault './core/security/keyvault.bicep' = {
   name: 'keyvault'
   scope: resourceGroup
   params: {
@@ -141,7 +147,6 @@ module containerApps 'core/host/container-apps.bicep' = {
   }
 }
 
-
 module keyVaultAccess './core/security/keyvault-access.bicep' = {
   name: 'keyvault-access'
   scope: resourceGroup
@@ -151,7 +156,7 @@ module keyVaultAccess './core/security/keyvault-access.bicep' = {
   }
 }
 
-module keyVaultSecretPostgresAdminPassword './core/security/keyvault-secret.bicep' =  {
+module keyVaultSecretPostgresAdminPassword './core/security/keyvault-secret.bicep' = {
   name: 'keyvault-secret-postgres-admin-password'
   scope: resourceGroup
   params: {
@@ -161,7 +166,7 @@ module keyVaultSecretPostgresAdminPassword './core/security/keyvault-secret.bice
   }
 }
 
-module keyVaultSecretDatabaseUrl './core/security/keyvault-secret.bicep' =  {
+module keyVaultSecretDatabaseUrl './core/security/keyvault-secret.bicep' = {
   name: 'keyvault-secret-database-url'
   scope: resourceGroup
   params: {
@@ -171,13 +176,23 @@ module keyVaultSecretDatabaseUrl './core/security/keyvault-secret.bicep' =  {
   }
 }
 
-module keyVaultSecretSecretKeyBase './core/security/keyvault-secret.bicep' =  {
+module keyVaultSecretSecretKeyBase './core/security/keyvault-secret.bicep' = {
   name: 'keyvault-secret-secret-key-base'
   scope: resourceGroup
   params: {
     keyVaultName: keyVault.outputs.name
     name: 'secret-key-base'
     secretValue: railsSecretKeyBase
+  }
+}
+
+module keyVaultSecretRailsMasterKey './core/security/keyvault-secret.bicep' = {
+  name: 'keyvault-secret-rails-master-key'
+  scope: resourceGroup
+  params: {
+    keyVaultName: keyVault.outputs.name
+    name: 'rails-master-key'
+    secretValue: railsMasterKey
   }
 }
 
@@ -200,8 +215,8 @@ module rails 'rails.bicep' = {
     keyVaultSecretSecretKeyBase
     keyVaultAccess
   ]
-} 
- 
+}
+
 // Add outputs from the deployment here, if needed.
 //
 // This allows the outputs to be referenced by other bicep deployments in the deployment pipeline,
@@ -210,7 +225,6 @@ module rails 'rails.bicep' = {
 //
 // Outputs are automatically saved in the local azd environment .env file.
 // To see these outputs, run `azd env get-values`,  or `azd env get-values --output json` for json output.
-
 
 output AZURE_LOCATION string = location
 output AZURE_RESOURCE_GROUP_NAME string = resourceGroup.name
