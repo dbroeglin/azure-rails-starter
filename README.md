@@ -116,7 +116,7 @@ rails new --database=postgresql --name=azure-rails-starter src
 rm -rf src/.git
 cd src
 sed -i 's/# root.*$/root "home#index"/' config/routes.rb
-cat >  app/controllers/home_controller.rb <<EOF
+cat > app/controllers/home_controller.rb <<EOF
 class HomeController < ApplicationController
   def index
     render plain: 'Hello World!'
@@ -145,6 +145,10 @@ If you want to make sure you can recreate the same environment, KeyVault needs t
 ```bash
     azd down --purge
 ```
+
+## Security consideration
+
+In this repository `src/config/master.key` has been committed to simplify deployment of the sample application. If you plan on building from the sample app please delete `config/master.key` and `config/credentials.yml.enc`. Commit the changes. Then run `bin/rails credentials:edit`. 
 
 ## Getting help
 
