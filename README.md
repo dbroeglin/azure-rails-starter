@@ -35,7 +35,7 @@ The following assets have been provided:
 - A freshly created Rails 7.1.3 application under directory `src`.
 
 
-### Getting it up and running in Azure
+### Getting the Rails app up and running in Azure
 
 Just run `azd up` to run the end-to-end infrastructure provisioning (`azd provision`) and deployment (`azd deploy`) flow. Visit the service endpoint listed to see your application up-and-running!
 
@@ -43,7 +43,7 @@ Quick start:
 
 ```bash
 SECRET_KEY_BASE="$(src/bin/rails secret)" \
-RAILS_MASTER_KEY="$(cat src/config/master.key)"
+RAILS_MASTER_KEY="$(cat src/config/master.key)" \
 azd up
 ```
 
@@ -114,16 +114,25 @@ The rails application has been created by running the following command:
 ```bash
 rails new --database=postgresql --name=azure-rails-starter src
 rm -rf src/.git
+cd src
+sed -i 's/# root.*$/root "home#index"/' config/routes.rb
+cat >  app/controllers/home_controller.rb <<EOF
+class HomeController < ApplicationController
+  def index
+    render plain: 'Hello World!'
+  end
+end
+EOF
 ```
 
-### Shell in the Azure Container App 
+### Obtain a shell in the Azure Container App 
 
 ```bash
 . ./.env
 az containerapp exec --name $SERVICE_RAILS_NAME --resource-group $AZURE_RESOURCE_GROUP_NAME
 ```
 
-This can be useful to apply `bin/rails db:migrate` commands or access the Rails console through `bin/rails console`.
+This can be useful to apply `bin/rails db:migrate` commands or access the Rails console through `bin/rails console`. Note that the default `bin/docker-entrypoint` already runs `bin/rails db:prepare`.
 
 ### Clean up resources
 
