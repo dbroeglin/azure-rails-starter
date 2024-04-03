@@ -120,6 +120,7 @@ module postgresServer 'core/database/postgresql/flexibleserver.bicep' = {
     administratorLoginPassword: postgresAdminPassword
     databaseNames: [postgresDatabaseName]
     allowAzureIPsFirewall: true
+    azureExtensions: ['PLPGSQL']
   }
 }
 

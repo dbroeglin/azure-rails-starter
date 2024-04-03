@@ -12,6 +12,7 @@ param databaseNames array = []
 param allowAzureIPsFirewall bool = false
 param allowAllIPsFirewall bool = false
 param allowedSingleIPs array = []
+param azureExtensions array = []
 
 // PostgreSQL version
 param version string
@@ -30,6 +31,7 @@ resource postgresServer 'Microsoft.DBforPostgreSQL/flexibleServers@2022-12-01' =
     highAvailability: {
       mode: 'Disabled'
     }
+
   }
 
   resource database 'databases' = [for name in databaseNames: {
@@ -60,6 +62,13 @@ resource postgresServer 'Microsoft.DBforPostgreSQL/flexibleServers@2022-12-01' =
     }
   }]
 
+  resource configurations 'configurations@2022-12-01' =  {
+    name: 'azure.extensions'
+    properties: {
+      value: join(azureExtensions, ',')
+      source: 'user-override'
+    }
+  }
 }
 
 output POSTGRES_DOMAIN_NAME string = postgresServer.properties.fullyQualifiedDomainName
