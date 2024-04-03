@@ -8,18 +8,21 @@
 !includeurl AzurePuml/Containers/AzureContainerApp.puml
 !includeurl AzurePuml/Security/AzureKeyVault.puml
 !includeurl AzurePuml/Databases/AzureDatabaseForPostgreSQL.puml
+!includeurl AzurePuml/Management/AzureMonitor.puml
 
 Person(person, "User")
-
+ 
 Boundary(system, "Environment", "Azure Container Apps Environment") {
   AzureContainerApp(rails, "Rails", "Container")
 }
 
 AzureDatabaseForPostgreSQL(database, "Database", "azure_rails_starter_production")
 AzureKeyVault(keyvault, "Key Vault", "Secrets", "Database URL, Rails Secret Key Base")
+AzureMonitor(monitor, "Monitor", "Logs")
 
 person -> rails: Uses
 rails -> database: Reads/Writes
 rails -down-> keyvault: "Read Secrets"
+rails -down-> monitor: "Write Logs"
 
 @enduml
