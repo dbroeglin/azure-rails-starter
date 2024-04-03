@@ -62,7 +62,7 @@ resource postgresServer 'Microsoft.DBforPostgreSQL/flexibleServers@2022-12-01' =
     }
   }]
 
-  resource configurations 'configurations@2022-12-01' =  {
+  resource configurations 'configurations' =  {
     name: 'azure.extensions'
     properties: {
       value: join(azureExtensions, ',')

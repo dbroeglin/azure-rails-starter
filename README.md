@@ -139,4 +139,6 @@ If you want to make sure you can recreate the same environment, KeyVault needs t
 
 ## Getting help
 
+Sometimes deployment fails because the PostgreSQL resource is still busy and extensions cannot yet be applied. In a case like that just re-run the deployment.
+
 If you're working with this project and running into issues, please post an Issue by clicking on the link above.
