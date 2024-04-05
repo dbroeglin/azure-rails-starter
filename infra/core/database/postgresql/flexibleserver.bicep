@@ -17,8 +17,7 @@ param azureExtensions array = []
 // PostgreSQL version
 param version string
 
-// Latest official version 2022-12-01 does not have Bicep types available
-resource postgresServer 'Microsoft.DBforPostgreSQL/flexibleServers@2022-12-01' = {
+resource postgresServer 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-01-preview' = {
   location: location
   tags: tags
   name: name
@@ -74,7 +73,7 @@ resource configurations 'Microsoft.DBforPostgreSQL/flexibleServers/configuration
     value: join(azureExtensions, ',')
     source: 'user-override'
   }
-dependsOn: [
+  dependsOn: [
     firewall_all
   ]
 }
