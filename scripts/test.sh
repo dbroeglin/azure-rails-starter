@@ -8,7 +8,7 @@ fi
 
 app_name=$(basename $1)
 
-export AZURE_ENV_NAME="test-001"
+export AZURE_ENV_NAME="test-002"
 export AZURE_LOCATION="francecentral"
 export AZURE_SUBSCRIPTION_ID=$(az account show --output tsv --query id)
 
