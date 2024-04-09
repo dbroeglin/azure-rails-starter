@@ -19,7 +19,7 @@
       "value": "${RAILS_MASTER_KEY}"
     },
     "postgresDatabaseName": {
-      "value": "${SERVICE_RAILS_DATABASE_NAME}"
+      "value": "${SERVICE_RAILS_DATABASE_NAME=azure_rails_starter_production}"
     }
   }
 }
