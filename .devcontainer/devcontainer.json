@@ -17,7 +17,7 @@
             "packages": "libpq-dev, libvips, postgresql-client-13"
         },
         "ghcr.io/devcontainers/features/ruby:1": {
-            "version": "3.3.0"
+            "version": "3.3.5"
           },
         "ghcr.io/devcontainers/features/node:1": {
             "version": 21
@@ -41,7 +41,8 @@
                 "GitHub.vscode-github-actions",
                 "ms-azuretools.azure-dev",
                 "ms-azuretools.vscode-bicep",
-                "ms-azuretools.vscode-docker"
+                "ms-azuretools.vscode-docker",
+                "ms-azuretools.vscode-azure-github-copilot"
             ]
         }
     },
