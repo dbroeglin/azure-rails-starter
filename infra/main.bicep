@@ -13,6 +13,10 @@ param environmentName string
 @description('Primary location for all resources')
 param location string
 
+@minLength(1)
+@description('Current user principal ID')
+param principalId string
+
 @secure()
 @description('PostGreSQL Server administrator password')
 param postgresAdminPassword string
@@ -148,12 +152,21 @@ module keyVault './core/security/keyvault.bicep' = {
   }
 }
 
-module keyVaultAccess './core/security/keyvault-access.bicep' = {
-  name: 'keyvault-access'
+module railsKeyVaultAccess './core/security/keyvault-access.bicep' = {
+  name: 'rails-keyvault-access'
   scope: resourceGroup
   params: {
     keyVaultName: keyVault.outputs.name
     principalId: railsIdentity.outputs.principalId
+  }
+}
+
+module userKeyVaultAccess './core/security/keyvault-access.bicep' = {
+  name: 'user-keyvault-access'
+  scope: resourceGroup
+  params: {
+    keyVaultName: keyVault.outputs.name
+    principalId: principalId
   }
 }
 
