@@ -116,6 +116,9 @@ rails new --database=postgresql --name=azure-rails-starter src
 rm -rf src/.git
 cd src
 sed -i '' 's/# root.*$/root "home#index"/' config/routes.rb
+sed -i '' '/azure_rails_starter_production$/,/DATABASE_PASSWORD/c\
+    url: <%= ENV["DATABASE_URL"] %>
+' config/database.yml
 cat > app/controllers/home_controller.rb <<EOF
 class HomeController < ApplicationController
   def index
