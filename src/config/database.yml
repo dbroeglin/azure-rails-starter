@@ -19,6 +19,7 @@ default: &default
   # https://guides.rubyonrails.org/configuring.html#database-pooling
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
+
 development:
   <<: *default
   database: azure_rails_starter_development
@@ -78,7 +79,20 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
-  <<: *default
-  database: azure_rails_starter_production
-  username: azure_rails_starter
-  password: <%= ENV["AZURE_RAILS_STARTER_DATABASE_PASSWORD"] %>
+  primary: &primary_production
+    <<: *default
+    database: azure_rails_starter_production
+    username: azure_rails_starter
+    password: <%= ENV["AZURE_RAILS_STARTER_DATABASE_PASSWORD"] %>
+  cache:
+    <<: *primary_production
+    database: azure_rails_starter_production_cache
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *primary_production
+    database: azure_rails_starter_production_queue
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *primary_production
+    database: azure_rails_starter_production_cable
+    migrations_paths: db/cable_migrate

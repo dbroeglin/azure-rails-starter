@@ -115,7 +115,7 @@ The rails application has been created by running the following command:
 rails new --database=postgresql --name=azure-rails-starter src
 rm -rf src/.git
 cd src
-sed -i 's/# root.*$/root "home#index"/' config/routes.rb
+sed -i '' 's/# root.*$/root "home#index"/' config/routes.rb
 cat > app/controllers/home_controller.rb <<EOF
 class HomeController < ApplicationController
   def index
