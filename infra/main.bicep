@@ -227,7 +227,7 @@ module rails 'rails.bicep' = {
   dependsOn: [
     keyVaultSecretDatabaseUrl
     keyVaultSecretSecretKeyBase
-    keyVaultAccess
+    railsKeyVaultAccess
   ]
 }
 
