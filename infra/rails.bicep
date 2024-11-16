@@ -75,7 +75,7 @@ module app 'core/host/container-app-upsert.bicep' = {
         identity: webIdentity.id
       }
     ]
-    targetPort: 80
+    targetPort: 3000
   }
 }
 
